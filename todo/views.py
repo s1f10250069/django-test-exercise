@@ -52,7 +52,7 @@ def update(request, task_id):
     context = {
         'task': task
     }
-    return render(request, "todo/edit.html")
+    return render(request, "todo/edit.html", context)
 
 
 def delete(request, task_id):
