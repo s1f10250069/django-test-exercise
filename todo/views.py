@@ -8,11 +8,14 @@ from todo.models import Task
 # Create your views here.
 def index(request):
     if request.method == 'POST':
+        due_at_raw = request.POST.get('due_at')
+        due_at_parsed = parse_datetime(due_at_raw) if due_at_raw else None
         task = Task(
             title=request.POST['title'],
-            due_at=make_aware(parse_datetime(request.POST['due_at']))
+            due_at=make_aware(due_at_parsed) if due_at_parsed else None
         )
         task.save()
+        return redirect('index')
 
     if request.GET.get('order') == 'due':
         tasks = Task.objects.order_by('due_at')
