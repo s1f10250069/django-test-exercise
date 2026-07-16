@@ -109,6 +109,16 @@ class TodoViewTestCase(TestCase):
         self.assertEqual(response.context['tasks'][0], task1)
         self.assertEqual(response.context['tasks'][1], task2)
 
+    def test_index_context_includes_remaining_tasks_count(self):
+        Task.objects.create(title='task1', completed=False, due_at=timezone.make_aware(datetime(2024, 7, 1)))
+        Task.objects.create(title='task2', completed=True, due_at=timezone.make_aware(datetime(2024, 8, 1)))
+
+        client = Client()
+        response = client.get('/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['remaining_tasks_count'], 1)
+
     def test_delete_task(self):
         task = Task(title='task1', due_at=timezone.make_aware(datetime(2024, 7, 1)))
         task.save()
@@ -201,3 +211,16 @@ class TodoViewTestCase(TestCase):
         client = Client()
         response = client.post('/{}/close'.format(task.pk))
         self.assertEqual(response.status_code, 405)
+def test_index_get_search(self):
+    task1 = Task(title='report')
+    task1.save()
+    task2 = Task(title='shopping')
+    task2.save()
+
+    client = Client()
+    response = client.get('/?keyword=report')
+
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(response.templates[0].name, 'todo/index.html')
+    self.assertEqual(len(response.context['tasks']), 1)
+    self.assertEqual(response.context['tasks'][0], task1)
