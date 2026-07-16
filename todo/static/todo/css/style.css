@@ -39,6 +39,24 @@ button:hover {
   background: linear-gradient(135deg, #ff5d8f, #ff9f1c);
 }
 
+.complete-button {
+  background: #34d399;
+  border: 1px solid #10b981;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.complete-button:hover {
+  background: #059669;
+  transform: translateY(-1px);
+}
+
+.complete-button:focus {
+  outline: 3px solid rgba(16, 185, 129, 0.35);
+}
+
 .text,
 ul {
   background: #fff;
