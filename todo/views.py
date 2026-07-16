@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.http import Http404
 from django.utils.timezone import make_aware
 from django.utils.dateparse import parse_datetime
+from django.db.models import F
 from todo.models import Task
 
 
@@ -17,7 +18,7 @@ def index(request):
         task.save()
 
     if request.GET.get('order') == 'due':
-        tasks = Task.objects.order_by('due_at')
+        tasks = Task.objects.order_by(F('due_at').asc(nulls_last=True))
     else:
         tasks = Task.objects.order_by('-posted_at')
 
