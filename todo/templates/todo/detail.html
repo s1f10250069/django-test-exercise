@@ -27,7 +27,13 @@
       <a href="{% url 'index' %}">Top</a>
     |  <a href="{% url 'update' task.id %}">Edit</a>
       | <a href="{% url 'delete' task.id %}">Delete</a>
-      |<a href="{% url 'close' task.id %}">Close</a>
+      {% if not task.completed %}
+      | <a href="{% url 'close' task.id %}">Close</a>
+      | <form action="{% url 'complete' task.id %}" method="post" style="display:inline; margin:0; padding:0;">
+          {% csrf_token %}
+          <button class="complete-button" type="submit">完了</button>
+        </form>
+      {% endif %}
     </div>
   </body>
 </html>

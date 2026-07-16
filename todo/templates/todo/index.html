@@ -55,6 +55,12 @@
         <li>Status: Not Completed</li>
         {% endif %}
       </ul>
+      {% if not task.completed %}
+      <form action="{% url 'complete' task.id %}" method="post" style="display:inline">
+        {% csrf_token %}
+        <button class="complete-button" type="submit">完了</button>
+      </form>
+      {% endif %}
     </div>
     {% endfor %}
   </body>
