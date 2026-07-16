@@ -19,8 +19,11 @@ def index(request):
     else:
         tasks = Task.objects.order_by('-posted_at')
 
+    remaining_tasks_count = Task.objects.filter(completed=False).count()
+
     context = {
-        'tasks': tasks
+        'tasks': tasks,
+        'remaining_tasks_count': remaining_tasks_count,
     }
     return render(request, 'todo/index.html', context)
 
