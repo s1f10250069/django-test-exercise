@@ -17,7 +17,7 @@ def index(request):
             due_at=make_aware(due_at_parsed) if due_at_parsed else None)
         task.save()
 
-keyword = request.GET.get('keyword')
+    keyword = request.GET.get('keyword')
     if keyword:
         tasks = Task.objects.filter(title__icontains=keyword)
     elif request.GET.get('order') == 'due':
