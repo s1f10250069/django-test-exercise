@@ -15,7 +15,6 @@ def index(request):
             due_at=make_aware(due_at_parsed) if due_at_parsed else None
         )
         task.save()
-        return redirect('index')
 
     if request.GET.get('order') == 'due':
         tasks = Task.objects.order_by('due_at')
