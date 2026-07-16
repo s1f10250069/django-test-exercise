@@ -18,7 +18,6 @@ def index(request):
         task.save()
 
 keyword = request.GET.get('keyword')
-
     if keyword:
         tasks = Task.objects.filter(title__icontains=keyword)
     elif request.GET.get('order') == 'due':
