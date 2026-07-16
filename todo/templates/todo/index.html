@@ -32,6 +32,14 @@
       <a href="{% url 'index' %}?order=due">Sort by Due Date</a> |
       <a href="{% url 'index' %}?order=post">Sort by Posted Date</a>
     </div>
+<form action="{% url 'index' %}" method="get">
+  <input type="text" name="keyword" placeholder="タイトルを検索">
+  <button type="submit">Search</button>
+</form>
+
+<br>
+
+    <p>残りのタスク: {{ remaining_tasks_count }}件</p>
 
     {% for task in tasks %}
     <div class="text">
@@ -47,6 +55,12 @@
         <li>Status: Not Completed</li>
         {% endif %}
       </ul>
+      {% if not task.completed %}
+      <form action="{% url 'complete' task.id %}" method="post" style="display:inline">
+        {% csrf_token %}
+        <button class="complete-button" type="submit">完了</button>
+      </form>
+      {% endif %}
     </div>
     {% endfor %}
   </body>

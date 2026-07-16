@@ -72,6 +72,17 @@ class TodoViewTestCase(TestCase):
         self.assertEqual(response.templates[0].name, 'todo/index.html')
         self.assertEqual(len(response.context['tasks']), 1)
 
+    def test_index_post_without_due_date(self):
+        client = Client()
+        data = {'title': 'Task without due date'}
+        response = client.post('/', data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.templates[0].name, 'todo/index.html')
+        self.assertEqual(len(response.context['tasks']), 1)
+        task = Task.objects.get(title='Task without due date')
+        self.assertIsNone(task.due_at)
+
     def test_index_get_order_post(self):
         task1 = Task(title='task1', due_at=timezone.make_aware(datetime(2024, 7, 1)))
         task1.save()
@@ -97,6 +108,16 @@ class TodoViewTestCase(TestCase):
         self.assertEqual(response.templates[0].name, 'todo/index.html')
         self.assertEqual(response.context['tasks'][0], task1)
         self.assertEqual(response.context['tasks'][1], task2)
+
+    def test_index_context_includes_remaining_tasks_count(self):
+        Task.objects.create(title='task1', completed=False, due_at=timezone.make_aware(datetime(2024, 7, 1)))
+        Task.objects.create(title='task2', completed=True, due_at=timezone.make_aware(datetime(2024, 8, 1)))
+
+        client = Client()
+        response = client.get('/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['remaining_tasks_count'], 1)
 
     def test_delete_task(self):
         task = Task(title='task1', due_at=timezone.make_aware(datetime(2024, 7, 1)))
@@ -154,16 +175,52 @@ class TodoViewTestCase(TestCase):
 
         self.assertEqual(response.status_code, 404)
 
-    def test_close_success(self):
+    def test_complete_success(self):
+        task = Task(title='task1', completed=False)
+        task.save()
+        client = Client()
+        response = client.post('/{}/complete'.format(task.pk))
+        self.assertRedirects(response, '/')
+        task.refresh_from_db()
+        self.assertTrue(task.completed)
+
+    def test_complete_fail(self):
+        client = Client()
+        response = client.post('/1/complete')
+        self.assertEqual(response.status_code, 404)
+
+    def test_complete_method_not_allowed(self):
+        task = Task(title='task1', completed=False)
+        task.save()
+        client = Client()
+        response = client.get('/{}/complete'.format(task.pk))
+        self.assertEqual(response.status_code, 405)
+
+    def test_close_get_success(self):
         task = Task(title='task1', completed=False)
         task.save()
         client = Client()
         response = client.get('/{}/close'.format(task.pk))
         self.assertRedirects(response, '/')
         task.refresh_from_db()
-        self.assertTrue(task.completed)
+        self.assertFalse(task.completed)
 
-    def test_close_fail(self):
+    def test_close_post_not_allowed(self):
+        task = Task(title='task1', completed=False)
+        task.save()
         client = Client()
-        response = client.get('/1/close')
-        self.assertEqual(response.status_code, 404)
+        response = client.post('/{}/close'.format(task.pk))
+        self.assertEqual(response.status_code, 405)
+def test_index_get_search(self):
+    task1 = Task(title='report')
+    task1.save()
+    task2 = Task(title='shopping')
+    task2.save()
+
+    client = Client()
+    response = client.get('/?keyword=report')
+
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(response.templates[0].name, 'todo/index.html')
+    self.assertEqual(len(response.context['tasks']), 1)
+    self.assertEqual(response.context['tasks'][0], task1)
