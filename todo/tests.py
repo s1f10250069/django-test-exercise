@@ -167,3 +167,17 @@ class TodoViewTestCase(TestCase):
         client = Client()
         response = client.get('/1/close')
         self.assertEqual(response.status_code, 404)
+
+def test_index_get_search(self):
+    task1 = Task(title='report')
+    task1.save()
+    task2 = Task(title='shopping')
+    task2.save()
+
+    client = Client()
+    response = client.get('/?keyword=report')
+
+    self.assertEqual(response.status_code, 200)
+    self.assertEqual(response.templates[0].name, 'todo/index.html')
+    self.assertEqual(len(response.context['tasks']), 1)
+    self.assertEqual(response.context['tasks'][0], task1)
