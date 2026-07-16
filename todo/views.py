@@ -14,7 +14,11 @@ def index(request):
         )
         task.save()
 
-    if request.GET.get('order') == 'due':
+    keyword = request.GET.get('keyword')
+
+    if keyword:
+        tasks = Task.objects.filter(title__icontains=keyword)
+    elif request.GET.get('order') == 'due':
         tasks = Task.objects.order_by('due_at')
     else:
         tasks = Task.objects.order_by('-posted_at')
@@ -25,6 +29,7 @@ def index(request):
         'tasks': tasks,
         'remaining_tasks_count': remaining_tasks_count,
     }
+
     return render(request, 'todo/index.html', context)
 
 
